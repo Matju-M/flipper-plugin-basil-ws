@@ -19,11 +19,13 @@ import {
 } from '@ant-design/icons';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 export function plugin(client: PluginClient<any, any>) {
   const state = createState<Record<string, []>>({});
+  // const socketState = createState<Record<string, {}>>({});
 
   const sendToSocket = (value: any, socketUrl: string) => {
     client.send('send', { data: value, socketUrl });
@@ -148,6 +150,18 @@ export function Component() {
     instance.sendMockToSocket(sendMock, selected);
   }
 
+  const handleSetSendMock = (value: string) => {
+    setSendMock(sanitizeValue(value || ''));
+  }
+
+  const handleSetSend = (value: string) => {
+    setSendSocket(sanitizeValue(value || ''));
+  }
+
+  const sanitizeValue = (value: string) => {
+    return value?.replace(/(\n|\t|\s)/g, '');
+  }
+
   const firstSocket = useMemo(() => {
     return Object.keys(data)?.[0];
   }, [data]);
@@ -165,16 +179,16 @@ export function Component() {
           <Toolbar>
             <ControlContainer>
               <Tooltip title="delete all">
-                <Button icon={<DeleteOutlined />} onClick={handleOnDelete} />
+                <Button style={{ width: '50px' }} icon={<DeleteOutlined />} onClick={handleOnDelete} />
               </Tooltip>
 
               <Input.Group compact style={{ marginLeft: '10px' }}>
-                <Input style={{ maxWidth: '80%' }} onChange={(value) => setSendSocket(value.target.value)} />
+                <TextArea style={{ maxWidth: '80%' }} rows={4} onChange={(value: any) => handleSetSend(value.target.value)}></TextArea>
                 <Button type="primary" onClick={handleSend}>Send</Button>
               </Input.Group>
 
               <Input.Group compact style={{ marginLeft: '10px' }}>
-                <Input style={{ maxWidth: '80%' }} onChange={(value) => setSendMock(value.target.value)} />
+                <TextArea style={{ maxWidth: '80%' }} rows={4} onChange={(value: any) => handleSetSendMock(value.target.value)}></TextArea>
                 <Button type="primary" onClick={handleMock}>Mock</Button>
               </Input.Group>
             </ControlContainer>
@@ -185,6 +199,7 @@ export function Component() {
                   <Option key={index} value={index}>{index}</Option>
                 ))}
               </SSelect>
+
             </SelectContainer>
           </Toolbar>
 
@@ -211,7 +226,7 @@ export function Component() {
 const ControlContainer = styled.div`
   display: flex;
   flex-direct: column;
-  max-width: 90vh;  
+  max-width: 100vh;  
 `;
 
 const Loader = styled.div`
@@ -229,7 +244,7 @@ const Toolbar = styled.div`
 
 const SelectContainer = styled.div`
   margin: 10px 10px 10px 0;
-  width: 50%;
+  max-width: 100vh;
 `;
 
 const SSelect = styled(Select)`

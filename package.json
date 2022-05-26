@@ -2,7 +2,7 @@
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-basil-ws",
   "id": "flipper-plugin-basil-ws",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "pluginType": "client",
   "author": {
     "name": "Matthew Mangion"
@@ -19,7 +19,9 @@
   "flipperBundlerEntry": "src/index.tsx",
   "license": "MIT",
   "keywords": [
-    "flipper-plugin"
+    "flipper-plugin",
+    "react-native",
+    "websocket"
   ],
   "icon": "rocket",
   "title": "Basil WS (RN)",
@@ -51,6 +53,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "lodash": "^4.17.21",
+    "pretty-print-json": "^1.2.4",
     "react-native": "^0.68.2"
   }
 }
