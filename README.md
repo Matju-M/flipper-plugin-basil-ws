@@ -32,7 +32,7 @@ if (__DEV__) {
 ### Install [flipper-plugin-basil-ws](https://github.com/Matju-M/flipper-plugin-basil-ws) in Flipper desktop client:
 
 ```
-Manage Plugins > Install Plugins > search "redux-debugger" > Install
+Manage Plugins > Install Plugins > search "basil-ws" > Install
 ```
 
 Start your app, then you should be able to see 
