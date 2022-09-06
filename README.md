@@ -2,7 +2,7 @@
 
 Websocket Flipper Plugin
 
-![screenshot of the plugin](https://i.imgur.com/D51uYt9.png)
+![screenshot of the plugin](https://i.imgur.com/QyMYKWy.png)
 
 This plugin allows
 - Monitoring the Websocket Tunnel
