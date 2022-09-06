@@ -4,28 +4,44 @@ import {
   usePlugin,
   createState,
   useValue,
-  Layout,
   PluginClient,
-  styled
+  DetailSidebar,
 } from 'flipper-plugin';
-import { List, Button, Tooltip, Select, Input } from 'antd';
 import {
-  CloseCircleOutlined,
-  DownCircleOutlined,
-  ExclamationCircleOutlined,
-  InfoCircleOutlined,
-  UpCircleOutlined,
+  List,
+  Button,
+  Tooltip,
+  Select,
+  Input,
+  Empty
+} from 'antd';
+
+import {
   DeleteOutlined
 } from '@ant-design/icons';
 
+import {
+  Shell,
+  Toolbar,
+  Main,
+  ControlContainer,
+  SSelect,
+  Container,
+} from './index.style'
+
+import Message from "./Message";
 const { Option } = Select;
 const { TextArea } = Input;
+
+const sanitizeValue = (value: string) => {
+  return value?.replace(/(\n|\t|\s)/g, '');
+}
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 export function plugin(client: PluginClient<any, any>) {
   const state = createState<Record<string, []>>({});
-  // const socketState = createState<Record<string, {}>>({});
+  const socketState = createState<Record<string, {}>>({});
 
   const sendToSocket = (value: any, socketUrl: string) => {
     client.send('send', { data: value, socketUrl });
@@ -37,7 +53,7 @@ export function plugin(client: PluginClient<any, any>) {
 
   client.onMessage("send", ({ key, data }) => {
     state.update((draft: any) => {
-      const message = { message: JSON.stringify(data, null, 2)?.replace(/\\/g, ''), type: "sent" };
+      const message = { message: data, type: "sent" };
       if (!draft[key]) {
         draft[key] = [message];
         return;
@@ -74,12 +90,12 @@ export function plugin(client: PluginClient<any, any>) {
   client.onMessage('message', ({ key, data }) => {
     state.update((draft: any) => {
 
-      const formatted = JSON.stringify(data, null, 2)?.replace(/\\/g, '');
-      if (!formatted) {
-        return;
-      }
+      // const formatted = JSON.stringify(data, null, 2)?.replace(/\\/g, '');
+      // if (!formatted) {
+      //   return;
+      // }
 
-      const message = { message: formatted, type: "received" };
+      const message = { message: data, type: "received" };
 
       if (!draft[key]) {
         draft[key] = [message];
@@ -92,7 +108,7 @@ export function plugin(client: PluginClient<any, any>) {
 
   client.onMessage('closed', ({ key, data }) => {
     state.update((draft: any) => {
-      const message = { message: JSON.stringify(data, null, 2)?.replace(/\\/g, ''), type: "closed" };
+      const message = { message: data, type: "closed" };
 
       if (!draft[key]) {
         draft[key] = [message];
@@ -105,7 +121,7 @@ export function plugin(client: PluginClient<any, any>) {
 
   client.onMessage('error', ({ key, data }) => {
     state.update((draft: any) => {
-      const message = { message: JSON.stringify(data, null, 2)?.replace(/\\/g, ''), type: "error" };
+      const message = { message: data, type: "error" };
       if (!draft[key]) {
         draft[key] = [message];
         return;
@@ -126,12 +142,12 @@ export function Component() {
   const [selected, setSelected] = useState('');
   const [sendSocket, setSendSocket] = useState('');
   const [sendMock, setSendMock] = useState('');
-
+  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  
   useEffect(() => {
     if (!selected && data) {
       setSelected(Object.keys(data)[0])
     }
-
   }, [data]);
 
   const handleOnChange = (key: string) => {
@@ -157,101 +173,108 @@ export function Component() {
   const handleSetSend = (value: string) => {
     setSendSocket(sanitizeValue(value || ''));
   }
-
-  const sanitizeValue = (value: string) => {
-    return value?.replace(/(\n|\t|\s)/g, '');
-  }
-
-  const firstSocket = useMemo(() => {
-    return Object.keys(data)?.[0];
-  }, [data]);
-
+  
+  const sockets = useMemo(() => Object.keys(data) || [], [data]);
+  
+  const parseSelectedMessage = useMemo(() => {
+    if (!selectedMessage) {
+      return null;
+    }
+    
+    try {
+      return JSON.parse(selectedMessage);
+    } catch (e) {
+      return selectedMessage
+    }
+  }, [selectedMessage]);
+  
   return (
-    <Layout.ScrollContainer>
-
-      {!firstSocket && <Loader>
-        <SSpan>
-          No Websockets registered yet!
-        </SSpan>
-      </Loader>}
-      {!!firstSocket &&
-        <>
-          <Toolbar>
+      <>
+        <Shell>
+          <Toolbar data-testID="Toolbar">
             <ControlContainer>
               <Tooltip title="delete all">
-                <Button style={{ width: '50px' }} icon={<DeleteOutlined />} onClick={handleOnDelete} />
+                <Button
+                    style={{ width: '50px' }}
+                    icon={<DeleteOutlined />}
+                    onClick={handleOnDelete}
+                />
               </Tooltip>
-
+          
               <Input.Group compact style={{ marginLeft: '10px' }}>
-                <TextArea style={{ maxWidth: '80%' }} rows={4} onChange={(value: any) => handleSetSend(value.target.value)}></TextArea>
-                <Button type="primary" onClick={handleSend}>Send</Button>
+                <TextArea
+                    style={{ maxWidth: '80%' }}
+                    rows={4}
+                    onChange={(value: any) => handleSetSend(value.target.value)}
+                />
+                <Button
+                    type="primary"
+                    onClick={handleSend}
+                >Send</Button>
               </Input.Group>
-
+          
               <Input.Group compact style={{ marginLeft: '10px' }}>
-                <TextArea style={{ maxWidth: '80%' }} rows={4} onChange={(value: any) => handleSetSendMock(value.target.value)}></TextArea>
-                <Button type="primary" onClick={handleMock}>Mock</Button>
+                <TextArea
+                    style={{ maxWidth: '80%' }}
+                    rows={4}
+                    onChange={(value: any) => handleSetSendMock(value.target.value)}
+                />
+                <Button
+                    type="primary"
+                    onClick={handleMock}
+                >Mock</Button>
               </Input.Group>
             </ControlContainer>
-
-            <SelectContainer>
-              <SSelect defaultValue={firstSocket} onChange={handleOnChange}>
-                {map(data, (value, index) => (
-                  <Option key={index} value={index}>{index}</Option>
+            <ControlContainer data-testID="ControlContainer">
+              <SSelect
+                  data-testID="SSelect"
+                  showSearch
+                  defaultValue={sockets?.[0]}
+                  optionFilterProp="children"
+                  filterOption={(input: string, option: any) => (option!.children as unknown as string).includes(input)}
+                  filterSort={(optionA: any, optionB: any) =>
+                      (optionA!.children as unknown as string)
+                      .toLowerCase()
+                      .localeCompare((optionB!.children as unknown as string).toLowerCase())
+                  }
+                  onChange={handleOnChange}
+                  disabled={sockets?.length === 0}
+              >
+                {map(sockets, (value, index) => (
+                    <Option key={index} value={value}>{value}</Option>
                 ))}
               </SSelect>
-
-            </SelectContainer>
+            </ControlContainer>
           </Toolbar>
-
-          <List
-            header={<div>Messages</div>}
-            dataSource={data[selected]}
-            renderItem={(item: any) => (<List.Item>
-              {item.type === "info" && <InfoCircleOutlined style={{ color: 'deepskyblue', verticalAlign: 'top' }} />}
-              {item.type === "received" && <DownCircleOutlined style={{ color: 'green', verticalAlign: 'top' }} />}
-              {item.type === "sent" && <UpCircleOutlined style={{ color: 'orange', verticalAlign: 'top' }
-              } />}
-              {item.type === "error" && <ExclamationCircleOutlined style={{ color: 'red', verticalAlign: 'top' }} />}
-              {item.type === "closed" && <CloseCircleOutlined style={{ color: 'gray', verticalAlign: 'top' }} />}
-              {' '}
-              <SPre>{item?.message}</SPre>
-            </List.Item>)}
-          />
-        </>
-      }
-    </Layout.ScrollContainer>
+          <Main>
+            {sockets?.length ? (
+              <Container>
+                <List
+                    itemLayout="vertical"
+                    dataSource={data[selected]}
+                    renderItem={(item: any) => (
+                        <Message
+                            messageObj={item}
+                            selectMessage={setSelectedMessage}
+                        />
+                    )}
+                />
+              </Container>
+            ) : (
+                <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No Websockets registered yet!"
+                />
+            )}
+          </Main>
+        </Shell>
+        <DetailSidebar>
+          {parseSelectedMessage && (
+              <Container>
+                <pre>{JSON.stringify(parseSelectedMessage, null, 2)}</pre>
+              </Container>
+          )}
+        </DetailSidebar>
+      </>
   );
 }
-
-const ControlContainer = styled.div`
-  display: flex;
-  flex-direct: column;
-  max-width: 100vh;  
-`;
-
-const Loader = styled.div`
-  display: flex;
-  height: 90vh;
-`;
-
-const SSpan = styled.span`
-  margin: auto;
-`;
-
-const Toolbar = styled.div`
-  margin: 10px;
-`;
-
-const SelectContainer = styled.div`
-  margin: 10px 10px 10px 0;
-  max-width: 100vh;
-`;
-
-const SSelect = styled(Select)`
-  width: 100%;
-`
-
-const SPre = styled.pre`
-  display: inline-block;
-  margin-bottom: 0;
-`;

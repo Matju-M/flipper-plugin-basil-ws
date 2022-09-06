@@ -37,7 +37,7 @@ Manage Plugins > Install Plugins > search "basil-ws" > Install
 
 Start your app, then you should be able to see 
 
-![screenshot of the plugin](https://i.imgur.com/ADmbD40.png)
+![screenshot of the plugin](https://i.imgur.com/QyMYKWy.png)
 
 By Default it will be in the `DISABLED` Section.
 
