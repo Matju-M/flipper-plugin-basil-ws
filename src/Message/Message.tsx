@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-
+import { extractDataFromMessage, parse } from '../utils/parse';
 import {
 	CloseCircleOutlined,
 	DownCircleOutlined,
@@ -25,23 +25,28 @@ enum MESSAGE_TYPES {
 	CLOSED = 'closed',
 }
 
-type MessageProps = {
+export type MessageObject = {
+	data: string;
+	isTrusted: boolean;
+}
+
+export type MessageProps = {
 	messageObj: {
 		type: string,
-		message: string,
+		message: string | string[] | MessageObject,
 	};
-	selectMessage: (message: string) => void;
+	selectMessage: (message: string | string[] | MessageObject) => void;
 };
 
 const Message = ({
-    messageObj,
+	messageObj,
 	selectMessage
 }: MessageProps) => {
 	const {
 		type,
 		message
 	} = messageObj;
-	
+
 	const typeIcon = useMemo(() => {
 		switch (type) {
 			case MESSAGE_TYPES.INFO:
@@ -65,14 +70,16 @@ const Message = ({
 					<CloseCircleOutlined style={{ color: 'gray', verticalAlign: 'middle' }} />
 				);
 		}
-	}, [ type ]);
+	}, [type]);
 	
+	const text = extractDataFromMessage(message);
+
 	return (
 		<List.Item style={{ padding: 0 }} onClick={() => selectMessage(message)}>
-			<Item wrap={false} gutter={16} veritcal="middle">
+			<Item wrap={false} gutter={16} vertical="middle">
 				<ItemIcon flex="none">{typeIcon}</ItemIcon>
 				<ItemMain flex="auto">
-					<CodeBlock>{message}</CodeBlock>
+					<CodeBlock>{text}</CodeBlock>
 				</ItemMain>
 			</Item>
 		</List.Item>

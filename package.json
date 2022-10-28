@@ -2,7 +2,7 @@
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-basil-ws",
   "id": "flipper-plugin-basil-ws",
-  "version": "0.2.5",
+  "version": "0.2.9",
   "pluginType": "client",
   "author": {
     "name": "Matthew Mangion"
@@ -34,7 +34,7 @@
   },
   "peerDependencies": {
     "antd": "latest",
-    "flipper-plugin": "^0.146.1"
+    "flipper-plugin": "^0.172.0"
   },
   "devDependencies": {
     "@babel/preset-react": "latest",

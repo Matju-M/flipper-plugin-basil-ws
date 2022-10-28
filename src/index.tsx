@@ -30,6 +30,9 @@ import {
 } from './index.style'
 
 import Message from "./Message";
+import { MessageObject } from './Message/Message';
+import { isArray } from 'lodash';
+import { parse } from './utils/parse';
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -90,11 +93,6 @@ export function plugin(client: PluginClient<any, any>) {
   client.onMessage('message', ({ key, data }) => {
     state.update((draft: any) => {
 
-      // const formatted = JSON.stringify(data, null, 2)?.replace(/\\/g, '');
-      // if (!formatted) {
-      //   return;
-      // }
-
       const message = { message: data, type: "received" };
 
       if (!draft[key]) {
@@ -142,7 +140,7 @@ export function Component() {
   const [selected, setSelected] = useState('');
   const [sendSocket, setSendSocket] = useState('');
   const [sendMock, setSendMock] = useState('');
-  const [selectedMessage, setSelectedMessage] = useState<string | null>(null);
+  const [selectedMessage, setSelectedMessage] = useState<string | string[] | MessageObject | null>(null);
   
   useEffect(() => {
     if (!selected && data) {
@@ -177,17 +175,9 @@ export function Component() {
   const sockets = useMemo(() => Object.keys(data) || [], [data]);
   
   const parseSelectedMessage = useMemo(() => {
-    if (!selectedMessage) {
-      return null;
-    }
-    
-    try {
-      return JSON.parse(selectedMessage);
-    } catch (e) {
-      return selectedMessage
-    }
+    return parse(selectedMessage);
   }, [selectedMessage]);
-  
+
   return (
       <>
         <Shell>
@@ -231,7 +221,9 @@ export function Component() {
                   showSearch
                   defaultValue={sockets?.[0]}
                   optionFilterProp="children"
-                  filterOption={(input: string, option: any) => (option!.children as unknown as string).includes(input)}
+                  filterOption={(input: string, option: any) => { 
+                    return (option!.children as unknown as string).includes(input)
+                  }}
                   filterSort={(optionA: any, optionB: any) =>
                       (optionA!.children as unknown as string)
                       .toLowerCase()
