@@ -19,7 +19,7 @@
   "main": "dist/bundle.js",
   "flipperBundlerEntry": "src/index.tsx",
   "license": "MIT",
-  "homepage": "https://github.com/Matju-M/flipper-plugin-basil-ws/blob/master/README.md",
+  "homepage": "https://github.com/Matju-M/flipper-plugin-basil-ws#readme",
   "bugs": {
     "email": "mmangion@gmail.com",
     "url": "https://github.com/Matju-M/flipper-plugin-basil-ws/issues"
