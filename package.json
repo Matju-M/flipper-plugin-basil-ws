@@ -2,10 +2,11 @@
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-basil-ws",
   "id": "flipper-plugin-basil-ws",
-  "version": "0.2.9",
+  "version": "1.0.0",
   "pluginType": "client",
   "author": {
-    "name": "Matthew Mangion"
+    "name": "Matthew Mangion",
+    "email": "mmangion@gmail.com"
   },
   "supportedDevices": [
     {
@@ -18,6 +19,11 @@
   "main": "dist/bundle.js",
   "flipperBundlerEntry": "src/index.tsx",
   "license": "MIT",
+  "homepage": "https://github.com/Matju-M/flipper-plugin-basil-ws/blob/master/README.md",
+  "bugs": {
+    "email": "mmangion@gmail.com",
+    "url": "https://github.com/Matju-M/flipper-plugin-basil-ws/issues"
+  },
   "keywords": [
     "flipper-plugin",
     "react-native",
